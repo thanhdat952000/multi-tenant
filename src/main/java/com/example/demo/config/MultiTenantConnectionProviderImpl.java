@@ -45,6 +45,22 @@ public class MultiTenantConnectionProviderImpl implements MultiTenantConnectionP
         releaseAnyConnection(connection);
     }
 
+//    @Override
+//    public Connection getConnection(String tenantIdentifier) throws SQLException {
+//        logger.info("Get connection for tenant: {}", tenantIdentifier);
+//        DataSource dataSource = TenantDataSourceConfig.getDataSource(tenantIdentifier);
+//        if (dataSource == null) {
+//            throw new HandleException("No DataSource found for tenant: " + tenantIdentifier);
+//        }
+//        return dataSource.getConnection();
+//    }
+//
+//    @Override
+//    public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
+//        logger.info("Release connection for tenant: {}", tenantIdentifier);
+//        releaseAnyConnection(connection);
+//    }
+
     @Override
     public boolean supportsAggressiveRelease() {
         return false;

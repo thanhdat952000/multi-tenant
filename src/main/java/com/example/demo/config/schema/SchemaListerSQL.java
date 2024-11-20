@@ -1,44 +1,33 @@
 package com.example.demo.config.schema;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class SchemaListerSQL {
-    @Autowired
-    private static DataSource dataSource;
+    private static final ConcurrentHashMap<String, Boolean> schemaCache = new ConcurrentHashMap<>();
 
     @Autowired
-    public SchemaListerSQL(DataSource dataSource) {
-        SchemaListerSQL.dataSource = dataSource;
+    private static JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public SchemaListerSQL(JdbcTemplate jdbcTemplate) {
+        SchemaListerSQL.jdbcTemplate = jdbcTemplate;
     }
 
-    public static List<String> getAllSchemas() {
-        List<String> schemas = new ArrayList<>();
-        String query = "SELECT schema_name FROM information_schema.schemata";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                schemas.add(rs.getString("schema_name"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static boolean isSchemaExists(String schemaName) {
+        if (schemaCache.containsKey(schemaName)) {
+            return schemaCache.get(schemaName);
         }
-        return schemas;
-    }
 
-    public static boolean isSchemaExists(String schemaToCheck) {
-        List<String> schemas = getAllSchemas();
-        return schemas.contains(schemaToCheck);
+        String sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = ?";
+        boolean exists = Boolean.TRUE.equals(jdbcTemplate.query(sql, new Object[]{schemaName}, ResultSet::next));
+
+        schemaCache.put(schemaName, exists);
+        return exists;
     }
 }

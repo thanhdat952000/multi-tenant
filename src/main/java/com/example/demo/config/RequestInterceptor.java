@@ -13,11 +13,6 @@ public class RequestInterceptor implements HandlerInterceptor {
         String tenantID = request.getHeader("X-TenantID");
         System.out.println("Search for X-TenantID  :: " + tenantID);
         System.out.println("____________________________________________");
-//        if (tenantID.isEmpty()) {
-//            response.getWriter().write("X-TenantID not present in the Request Header");
-//            response.setStatus(400);
-//            return false;
-//        }
         TenantContext.setCurrentTenant(tenantID);
         return true;
     }
