@@ -1,6 +1,6 @@
 package com.example.demo.config;
 
-import com.example.demo.config.tenant.TenantCache;
+import com.example.demo.config.schema.SchemaListerSQL;
 import com.example.demo.exception.HandleException;
 import com.example.demo.utils.Constants;
 import com.example.demo.utils.Messages;
@@ -15,7 +15,7 @@ public class TenantSchemaResolver implements CurrentTenantIdentifierResolver {
     public String resolveCurrentTenantIdentifier() {
         String tenantId = TenantContext.getCurrentTenant();
         if (StringUtils.isNotBlank(tenantId)) {
-            if (!TenantCache.schemaExists(tenantId)) {
+            if (!SchemaListerSQL.isSchemaExists(tenantId)) {
                 throw new HandleException(Messages.SCHEMA_NOT_FOUND + tenantId);
             }
             return tenantId;
